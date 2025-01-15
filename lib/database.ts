@@ -1,15 +1,15 @@
 // lib/database.ts
 import mongoose from "mongoose";
 
-const MONGO_URI = process.env.MONGO_URI!;
+const MONGO_URI = "mongodb+srv://rc5383467:sVzmWF94c0hJFW2a@portfolio-contacts.0dj7g.mongodb.net/?retryWrites=true&w=majority";
 
 if (!MONGO_URI) {
     throw new Error("Please define the MONGO_URI environment variable");
 }
 
 interface MongooseCache {
-    conn: mongoose.Connection | null;
-    promise: Promise<mongoose.Connection> | null;
+    conn: typeof mongoose | null;
+    promise: Promise<typeof mongoose> | null;
 }
 
 declare global {
@@ -18,23 +18,25 @@ declare global {
 
 let cached = global.mongooseCache || { conn: null, promise: null };
 
-async function dbConnect(): Promise<mongoose.Connection> {
+async function dbConnect(): Promise<typeof mongoose> {
     if (cached.conn) {
-        console.log("Using cached database connection");
         return cached.conn;
     }
 
     if (!cached.promise) {
-        console.log("Creating new database connection...");
-        cached.promise = mongoose.connect(MONGO_URI).then((mongooseInstance) => mongooseInstance.connection);
+        const opts = {
+            bufferCommands: false,
+            useNewUrlParser: true,
+            useUnifiedTopology: true,
+        };
+
+        cached.promise = mongoose.connect(MONGO_URI, opts);
     }
 
     try {
         cached.conn = await cached.promise;
-        console.log("Database connected successfully");
     } catch (e) {
         cached.promise = null;
-        console.error("Database connection failed:", e);
         throw e;
     }
 
