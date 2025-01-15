@@ -1,4 +1,3 @@
-import { Progress } from '@/components/ui/progress';
 import { skills } from '@/lib/api';
 import Image from 'next/image';
 
@@ -33,13 +32,15 @@ export default function AboutPage() {
       <div className="mt-12">
         <h2 className="text-2xl font-bold mb-6">Skills</h2>
         <div className="grid gap-4 sm:grid-cols-2">
-          {skills.map((skill) => (
-            <div key={skill.id} className="space-y-2">
+          {skills.map((skill, index) => (
+            <div key={index} className="space-y-2">
               <div className="flex justify-between">
                 <span className="font-medium">{skill.name}</span>
                 <span className="text-muted-foreground">{skill.level}%</span>
               </div>
-              <Progress value={skill.level} className="h-2" />
+              <div className="relative h-2 rounded-full bg-muted">
+                <div className="h-full rounded-full bg-primary" style={{ width: `${skill.level}%` }} />
+              </div>
             </div>
           ))}
         </div>
