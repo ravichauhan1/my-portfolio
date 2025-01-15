@@ -16,25 +16,25 @@ declare global {
     var mongooseCache: MongooseCache;
 }
 
-// Use the global cache to avoid re-initializing the database connection
 let cached = global.mongooseCache || { conn: null, promise: null };
 
 async function dbConnect(): Promise<mongoose.Connection> {
     if (cached.conn) {
-        // If the connection is cached, use it
+        console.log("Using cached database connection");
         return cached.conn;
     }
 
     if (!cached.promise) {
-        // If there's no cached promise, initiate a new connection
+        console.log("Creating new database connection...");
         cached.promise = mongoose.connect(MONGO_URI).then((mongooseInstance) => mongooseInstance.connection);
     }
 
     try {
         cached.conn = await cached.promise;
+        console.log("Database connected successfully");
     } catch (e) {
-        // Reset the promise if there's an error and throw it
         cached.promise = null;
+        console.error("Database connection failed:", e);
         throw e;
     }
 
