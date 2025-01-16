@@ -1,7 +1,7 @@
 // lib/database.ts
 import mongoose from "mongoose";
 
-const MONGO_URI = "mongodb+srv://rc5383467:sVzmWF94c0hJFW2a@portfolio-contacts.0dj7g.mongodb.net/?retryWrites=true&w=majority";
+const MONGO_URI = "mongodb+srv://rc5383467:sVzmWF94c0hJFW2a@portfolio-contacts.0dj7g.mongodb.net/portfolio?retryWrites=true&w=majority";
 
 if (!MONGO_URI) {
     throw new Error("Please define the MONGO_URI environment variable");
@@ -35,6 +35,7 @@ async function dbConnect(): Promise<typeof mongoose> {
 
     try {
         cached.conn = await cached.promise;
+        cached.promise = null;
     } catch (e) {
         cached.promise = null;
         throw e;
@@ -44,3 +45,4 @@ async function dbConnect(): Promise<typeof mongoose> {
 }
 
 export default dbConnect;
+
