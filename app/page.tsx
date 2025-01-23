@@ -18,14 +18,14 @@ export default function Home() {
               </p>
             </div>
             <div className="flex flex-col gap-2 min-[400px]:flex-row">
-              <Link href="/projects">
+              <Link href="/contact">
                 <Button className="w-full min-[400px]:w-auto">
-                  View Projects <ArrowRight className="ml-2 h-4 w-4" />
+                  Get in Touch <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
               </Link>
-              <Link href="/contact">
+              <Link href="/about">
                 <Button variant="outline" className="w-full min-[400px]:w-auto">
-                  Contact Me
+                  About Me
                 </Button>
               </Link>
             </div>
