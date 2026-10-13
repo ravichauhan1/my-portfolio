@@ -1,16 +1,31 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Inter } from 'next/font/google';
+import { Plus_Jakarta_Sans, JetBrains_Mono, Instrument_Serif } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
-import { Navbar } from '@/components/navbar';
-import { Footer } from '@/components/footer';
-import { Toaster } from '@/components/ui/toaster';
+import { SiteHeader } from '@/components/site-header';
+import { SiteFooter } from '@/components/site-footer';
 
-const inter = Inter({ subsets: ['latin'] });
+const sans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-sans' });
+const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
+const serif = Instrument_Serif({
+  subsets: ['latin'],
+  weight: '400',
+  style: ['normal', 'italic'],
+  variable: '--font-serif',
+  adjustFontFallback: false,
+});
+
+const title = 'Ravikishan Chauhan — Software Engineer';
+const description =
+  'Software engineer in New Delhi with 2.5+ years of experience building web products end to end with React, Next.js, Node.js, PostgreSQL, Docker and the cloud, and adding AI features to them.';
 
 export const metadata: Metadata = {
-  title: 'Professional Portfolio',
-  description: 'A modern portfolio showcasing my work and expertise',
+  metadataBase: new URL('https://ravi-x.vercel.app'),
+  title,
+  description,
+  authors: [{ name: 'Ravikishan Chauhan', url: 'https://github.com/ravichauhan1' }],
+  openGraph: { title, description, type: 'website', images: ['/ravi.jpg'] },
+  twitter: { card: 'summary', title, description, images: ['/ravi.jpg'] },
 };
 
 export default function RootLayout({
@@ -20,19 +35,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" suppressHydrationWarning>
-      <body className={inter.className}>
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="system"
-          enableSystem
-          disableTransitionOnChange
-        >
-          <div className="flex min-h-screen px-5 md:px-10 lg:px-14 xl:px-20 flex-col">
-            <Navbar />
-            <main className="flex-1">{children}</main>
-            <Footer />
-          </div>
-          <Toaster />
+      <body className={`${sans.variable} ${mono.variable} ${serif.variable} font-sans`}>
+        <ThemeProvider attribute="class" defaultTheme="dark" enableSystem disableTransitionOnChange>
+          <a href="#main" className="skip-link">
+            Skip to content
+          </a>
+          <SiteHeader />
+          <main id="main">{children}</main>
+          <SiteFooter />
         </ThemeProvider>
       </body>
     </html>

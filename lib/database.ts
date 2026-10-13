@@ -1,48 +1,43 @@
-// lib/database.ts
-import mongoose from "mongoose";
-
-const MONGO_URI = "mongodb+srv://rc5383467:sVzmWF94c0hJFW2a@portfolio-contacts.0dj7g.mongodb.net/portfolio?retryWrites=true&w=majority";
-
-if (!MONGO_URI) {
-    throw new Error("Please define the MONGO_URI environment variable");
-}
+import mongoose from 'mongoose';
 
 interface MongooseCache {
-    conn: typeof mongoose | null;
-    promise: Promise<typeof mongoose> | null;
+  conn: typeof mongoose | null;
+  promise: Promise<typeof mongoose> | null;
 }
 
 declare global {
-    var mongooseCache: MongooseCache;
+  // eslint-disable-next-line no-var
+  var mongooseCache: MongooseCache | undefined;
 }
 
-let cached = global.mongooseCache || { conn: null, promise: null };
+const cached: MongooseCache = global.mongooseCache ?? { conn: null, promise: null };
+global.mongooseCache = cached;
 
 async function dbConnect(): Promise<typeof mongoose> {
-    if (cached.conn) {
-        return cached.conn;
-    }
-
-    if (!cached.promise) {
-        const opts = {
-            bufferCommands: false,
-            useNewUrlParser: true,
-            useUnifiedTopology: true,
-        };
-
-        cached.promise = mongoose.connect(MONGO_URI, opts);
-    }
-
-    try {
-        cached.conn = await cached.promise;
-        cached.promise = null;
-    } catch (e) {
-        cached.promise = null;
-        throw e;
-    }
-
+  if (cached.conn) {
     return cached.conn;
+  }
+
+  const uri = process.env.MONGO_URI;
+  if (!uri) {
+    throw new Error('MONGO_URI is not set');
+  }
+
+  if (!cached.promise) {
+    cached.promise = mongoose.connect(uri, {
+      bufferCommands: false,
+      serverSelectionTimeoutMS: 8000,
+    });
+  }
+
+  try {
+    cached.conn = await cached.promise;
+  } catch (error) {
+    cached.promise = null;
+    throw error;
+  }
+
+  return cached.conn;
 }
 
 export default dbConnect;
-
