@@ -1,18 +1,27 @@
 import './globals.css';
 import type { Metadata } from 'next';
-import { Plus_Jakarta_Sans, JetBrains_Mono, Instrument_Serif } from 'next/font/google';
+import localFont from 'next/font/local';
 import { ThemeProvider } from '@/components/theme-provider';
 import { SiteHeader } from '@/components/site-header';
 import { SiteFooter } from '@/components/site-footer';
 
-const sans = Plus_Jakarta_Sans({ subsets: ['latin'], variable: '--font-sans' });
-const mono = JetBrains_Mono({ subsets: ['latin'], variable: '--font-mono' });
-const serif = Instrument_Serif({
-  subsets: ['latin'],
-  weight: '400',
-  style: ['normal', 'italic'],
+// Fonts are bundled in app/fonts so builds never depend on reaching Google Fonts.
+const sans = localFont({
+  src: './fonts/plus-jakarta-sans-var.woff2',
+  weight: '200 800',
+  variable: '--font-sans',
+});
+const mono = localFont({
+  src: './fonts/jetbrains-mono-var.woff2',
+  weight: '100 800',
+  variable: '--font-mono',
+});
+const serif = localFont({
+  src: [
+    { path: './fonts/instrument-serif-400.woff2', weight: '400', style: 'normal' },
+    { path: './fonts/instrument-serif-400-italic.woff2', weight: '400', style: 'italic' },
+  ],
   variable: '--font-serif',
-  adjustFontFallback: false,
 });
 
 const title = 'Ravikishan Chauhan — Software Engineer';
