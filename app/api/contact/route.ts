@@ -19,7 +19,10 @@ async function saveContact(data: ContactInput) {
 }
 
 function failureName(reason: unknown) {
-  return reason instanceof Error ? reason.name : 'unknown';
+  if (!(reason instanceof Error)) return 'unknown';
+  // Missing configuration is safe to log in full and is the most common cause.
+  if (reason.message.endsWith('is not set')) return reason.message;
+  return reason.name;
 }
 
 export async function POST(request: Request) {
@@ -43,9 +46,10 @@ export async function POST(request: Request) {
   if (
     body !== null &&
     typeof body === 'object' &&
-    typeof (body as Record<string, unknown>).company === 'string' &&
-    (body as Record<string, string>).company.length > 0
+    typeof (body as Record<string, unknown>).hp_check === 'string' &&
+    (body as Record<string, string>).hp_check.length > 0
   ) {
+    console.warn('contact: honeypot filled, message ignored');
     return NextResponse.json({ ok: true });
   }
 
@@ -72,6 +76,8 @@ export async function POST(request: Request) {
   if (saved.status === 'rejected') {
     console.error('contact: message not saved:', failureName(saved.reason));
   }
+
+  console.info(`contact: email ${emailed.status === 'fulfilled' ? 'sent' : 'failed'}, database ${saved.status === 'fulfilled' ? 'saved' : 'failed'}`);
 
   if (emailed.status === 'rejected' && saved.status === 'rejected') {
     return fail(500, 'The message could not be sent. Please try again or use email.');

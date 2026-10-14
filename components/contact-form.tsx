@@ -60,7 +60,7 @@ export function ContactForm() {
       const response = await fetch('/api/contact', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...values, company: honeypot.current?.value ?? '' }),
+        body: JSON.stringify({ ...values, hp_check: honeypot.current?.value ?? '' }),
       });
       const result: ApiResponse = await response.json().catch(() => ({}));
 
@@ -123,11 +123,12 @@ export function ContactForm() {
 
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={sending} className="relative">
-      {/* Honeypot: hidden from people and assistive tech. */}
+      {/* Honeypot: hidden from people and assistive tech. The name and label are chosen so
+          browser autofill never recognises it (a field called "company" gets autofilled). */}
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
         <label>
-          Company
-          <input ref={honeypot} type="text" name="company" tabIndex={-1} autoComplete="off" />
+          Leave this empty
+          <input ref={honeypot} type="text" name="hp_check" tabIndex={-1} autoComplete="off" />
         </label>
       </div>
 
