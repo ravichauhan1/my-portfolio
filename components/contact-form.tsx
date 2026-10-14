@@ -1,7 +1,7 @@
 'use client';
 
 import { useId, useRef, useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { Controller, useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { ArrowRight, CircleCheck, Loader2, TriangleAlert } from 'lucide-react';
 import { CONTACT_LIMITS, contactSchema, type ContactInput } from '@/lib/contact-schema';
@@ -17,6 +17,10 @@ type ApiResponse = {
 };
 
 const labelClass = 'block text-sm font-medium';
+
+// Chrome ignores autocomplete="off" on name/email fields but skips address autofill for
+// tokens it doesn't recognise. Paired with neutral name attributes on those inputs.
+const NO_AUTOFILL = 'portfolio-contact';
 
 function inputClass(invalid: boolean, extra?: string) {
   return cn(
@@ -36,6 +40,7 @@ export function ContactForm() {
   const successRef = useRef<HTMLDivElement>(null);
 
   const {
+    control,
     register,
     handleSubmit,
     reset,
@@ -122,7 +127,13 @@ export function ContactForm() {
   const errorId = (name: string) => `${uid}-${name}-error`;
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)} noValidate aria-busy={sending} className="relative">
+    <form
+      onSubmit={handleSubmit(onSubmit)}
+      noValidate
+      autoComplete="off"
+      aria-busy={sending}
+      className="relative"
+    >
       {/* Honeypot: hidden from people and assistive tech. The name and label are chosen so
           browser autofill never recognises it (a field called "company" gets autofilled). */}
       <div className="absolute -left-[9999px] h-0 w-0 overflow-hidden" aria-hidden="true">
@@ -136,40 +147,60 @@ export function ContactForm() {
         <legend className="sr-only">Send a message</legend>
 
         <div className="min-w-0">
-          <label htmlFor={fieldId('name')} className={labelClass}>
+          <label htmlFor={fieldId('sender')} className={labelClass}>
             Name
           </label>
-          <input
-            id={fieldId('name')}
-            type="text"
-            autoComplete="name"
-            placeholder="Your name"
-            maxLength={CONTACT_LIMITS.name.max}
-            className={inputClass(Boolean(errors.name), 'h-11')}
-            aria-invalid={errors.name ? 'true' : 'false'}
-            aria-describedby={errors.name ? errorId('name') : undefined}
-            {...register('name')}
+          <Controller
+            control={control}
+            name="name"
+            render={({ field }) => (
+              <input
+                id={fieldId('sender')}
+                name="cf_sender"
+                type="text"
+                autoComplete={NO_AUTOFILL}
+                placeholder="e.g. Priya Sharma"
+                maxLength={CONTACT_LIMITS.name.max}
+                className={inputClass(Boolean(errors.name), 'h-11')}
+                aria-invalid={errors.name ? 'true' : 'false'}
+                aria-describedby={errors.name ? errorId('name') : undefined}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+              />
+            )}
           />
           <FieldError id={errorId('name')} message={errors.name?.message} />
         </div>
 
         <div className="min-w-0">
-          <label htmlFor={fieldId('email')} className={labelClass}>
+          <label htmlFor={fieldId('reply')} className={labelClass}>
             Email
           </label>
-          <input
-            id={fieldId('email')}
-            type="email"
-            inputMode="email"
-            autoComplete="email"
-            autoCapitalize="none"
-            spellCheck={false}
-            placeholder="name@company.com"
-            maxLength={CONTACT_LIMITS.email.max}
-            className={inputClass(Boolean(errors.email), 'h-11')}
-            aria-invalid={errors.email ? 'true' : 'false'}
-            aria-describedby={errors.email ? errorId('email') : undefined}
-            {...register('email')}
+          <Controller
+            control={control}
+            name="email"
+            render={({ field }) => (
+              <input
+                id={fieldId('reply')}
+                name="cf_reply"
+                type="text"
+                inputMode="email"
+                autoComplete={NO_AUTOFILL}
+                autoCapitalize="none"
+                spellCheck={false}
+                placeholder="you@example.com"
+                maxLength={CONTACT_LIMITS.email.max}
+                className={inputClass(Boolean(errors.email), 'h-11')}
+                aria-invalid={errors.email ? 'true' : 'false'}
+                aria-describedby={errors.email ? errorId('email') : undefined}
+                value={field.value}
+                onChange={field.onChange}
+                onBlur={field.onBlur}
+                ref={field.ref}
+              />
+            )}
           />
           <FieldError id={errorId('email')} message={errors.email?.message} />
         </div>
